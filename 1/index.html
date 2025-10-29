@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google</title>
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Epunda+Slab:wght@700&display=swap" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.menu {
+    width: calc(100% - 20px);
+    height: 60px;
+    background: rgba(128,128,128,0.3);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 20px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.menu a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 30px;
+    font-weight: 700;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+
+.menu a:hover { color: #ccc; }
+
+.content {
+    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    padding-bottom: 100px;
+}
+
+.welcome-text {
+    font-family: 'Epunda Slab', serif;
+    font-weight: 700;
+    font-size: 72px;
+    color: #fff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
+}
+
+.description {
+    font-family: 'Epunda Slab', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #fff;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.footer {
+    font-family: 'Epunda Slab', serif;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.page { display: none; flex-direction: column; justify-content: flex-start; align-items: center; text-align: center; flex: 1; }
+.active { display: flex; }
+
+/* Games page grid fixed to 5 buttons per row */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+    width: 100%;
+    justify-items: center;
+}
+
+.game-button {
+    background-color: #222;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    max-width: 150px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-button img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
+.game-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #fff, 0 0 40px #fff, 0 0 60px #fff;
+}
+
+@media (max-width: 1000px) {
+    .game-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+    .game-grid { grid-template-columns: repeat(2, 1fr); }
+    .welcome-text { font-size: 48px; }
+    .description { font-size: 16px; padding: 0 10px; }
+}
+
+.search-form {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 18px;
+    font-size: 16px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 30px;
+    outline: none;
+    background: rgba(34,34,34,0.9);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #fff;
+    box-shadow: 0 0 15px #fff, 0 0 30px #fff;
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div class="menu">
+    <a id="homeLink">Home</a>
+    <a id="gamesLink">G4m3s</a>
+    <a id="proxiesLink">Pr0x1es</a>
+</div>
+
+<!-- Home Page -->
+<div id="homePage" class="content page active">
+    <div class="welcome-text">Welcome To Aerus</div>
+    <div class="description">
+        This Website Is Full Of Stuff I Wont Say Because This Website Would Be Blocked By Securly,
+        Lightspeed, ETC. So If Your New, Please Enjoy Yourself By Searching What You Wanna Do On The Menu.
+    </div>
+
+    <form id="uv-form" class="search-form">
+      <input id="uv-search-engine" value="https://duckduckgo.com/&q=%s" type="hidden"/> 
+      <input id="uv-address" type="text" placeholder="Search DuckDuckGo or type a URL" class="search-input"/>
+    </form>
+</div>
+
+<!-- Games Page -->
+<div id="gamesPage" class="content page">
+    <div class="welcome-text">G4m3s</div>
+    <div class="description">In Here We Got G4m3s If You Know What We Mean! (WARNING: GAMES DONT SAVE DATA!)</div>
+    
+    <div class="game-grid">
+        <!-- Existing + new games -->
+        <div class="game-button" id="crazyCarsBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/331.png" alt="Crazy Cars"><div>Crazy Cars</div></div>
+        <div class="game-button" id="lolBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png" alt="1v1.lol"><div>1v1.lol</div></div>
+        <div class="game-button" id="aswcBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/435.png" alt="A Small World Cup"><div>A Small World Cup</div></div>
+        <div class="game-button" id="angryBirdsBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/63.png" alt="Angry Birds"><div>Angry Birds</div></div>
+        <div class="game-button" id="bouncemastersBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/437.png" alt="Bouncemasters"><div>Bouncemasters</div></div>
+        
+        <div class="game-button" id="candyCrushBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/171.png" alt="Candy Crush"><div>Candy Crush</div></div>
+        <div class="game-button" id="drawJoustBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/387.png" alt="Draw Joust"><div>Draw Joust</div></div>
+        <div class="game-button" id="driveMadBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/35.png" alt="Drive Mad"><div>Drive Mad</div></div>
+        <div class="game-button" id="rainbowObbyBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/307.png" alt="Rainbow Obby"><div>Rainbow Obby</div></div>
+        <div class="game-button" id="bloodMoneyBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/454.png" alt="BLOODMONEY!"><div>BLOODMONEY!</div></div>
+
+        <div class="game-button" id="mc1122Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/182.png" alt="Minecraft 1.12.2"><div>Minecraft 1.12.2</div></div>
+        <div class="game-button" id="moneyRushBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/400.png" alt="Money Rush"><div>Money Rush</div></div>
+        <div class="game-button" id="mx3m2Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/97.png" alt="Motor X3M 2"><div>Motor X3M 2</div></div>
+        <div class="game-button" id="mx3m3Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/98.png" alt="Motor X3M 3"><div>Motor X3M 3</div></div>
+        <div class="game-button" id="mx3mppBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/124.png" alt="Motor X3M Pool Party"><div>Motor X3M Pool Party</div></div>
+
+        <div class="game-button" id="mx3msBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/99.png" alt="Motor X3M Spooky"><div>Motor X3M Spooky</div></div>
+        <div class="game-button" id="pvzBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/232.png" alt="Plants vs Zombies"><div>Plants vs Zombies</div></div>
+        <div class="game-button" id="run3Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/177.png" alt="Run 3"><div>Run 3</div></div>
+        <div class="game-button" id="ragdollArchersBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/186.png" alt="Ragdoll Archers"><div>Ragdoll Archers</div></div>
+        <div class="game-button" id="fnafBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png" alt="FNAF"><div>FNAF</div></div>
+
+        <div class="game-button" id="fnaf2Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/39.png" alt="FNAF 2"><div>FNAF 2</div></div>
+        <div class="game-button" id="fnaf3Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/40.png" alt="FNAF 3"><div>FNAF 3</div></div>
+        <div class="game-button" id="fnaf4Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/41.png" alt="FNAF 4"><div>FNAF 4</div></div>
+        <div class="game-button" id="fnaf4hlwnBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/428.png" alt="FNAF 4 Halloween"><div>FNAF 4 Halloween</div></div>
+        <div class="game-button" id="gdlBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/27.png" alt="Geometry Dash Lite"><div>Geometry Dash Lite</div></div>
+
+        <div class="game-button" id="gbBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/257.png" alt="Google Baseball"><div>Google Baseball</div></div>
+        <div class="game-button" id="tr2Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/10.png" alt="Temple Run 2"><div>Temple Run 2</div></div>
+        <div class="game-button" id="tfBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/108.png" alt="Tiny Fishing"><div>Tiny Fishing</div></div>
+        <div class="game-button" id="ts3sBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/201.png" alt="Time Shooter 3 SWAT"><div>Time Shooter 3 SWAT</div></div>
+        <div class="game-button" id="undertaleBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/184.png" alt="Undertale"><div>Undertale</div></div>
+        <div class="game-button" id="shBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/11.png" alt="Stickman Hook"><div>Stickman Hook</div></div>
+        <div class="game-button" id="brBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/66.png" alt="Basketball Random"><div>Basketball Random</div></div>
+        <div class="game-button" id="bbBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/6.png" alt="Block Blast"><div>Block Blast</div></div>
+        <div class="game-button" id="bridgerBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/14.png" alt="Bridge Race"><div>Bridge Race</div></div>
+        <div class="game-button" id="borBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/77.png" alt="Boxing Random"><div>Boxing Random</div></div>
+        <div class="game-button" id="cookiecBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/82.png" alt="Cookie Clicker"><div>Cookie Clicker</div></div>
+        <div class="game-button" id="badpBtn"><img src="https://images.sftcdn.net/images/t_app-icon-m/p/ee008054-96d6-11e6-9072-00163ed833e7/2283125323/bad-piggies-logo.png" alt="Bad Piggies"><div>Bad Piggies</div></div>
+        <div class="game-button" id="fmBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/392.png" alt="Flip Master"><div>Flip Master</div></div>
+        <div class="game-button" id="fnBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/261.png" alt="Fruit Ninja"><div>Fruit Ninja</div></div>
+        <div class="game-button" id="gn1Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/90.png" alt="Granny"><div>Granny</div></div>
+        <div class="game-button" id="gn2Btn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/125.png" alt="Granny 2"><div>Granny 2</div></div>
+        <div class="game-button" id="gsBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/91.png" alt="Gunspin"><div>Gunspin</div></div>
+        <div class="game-button" id="hhBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/422.png" alt="High Heels"><div>High Heels</div></div>
+        <div class="game-button" id="jjBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/7.png" alt="Jetpack Joyride"><div>Jetpack Joyride</div></div>
+        <div class="game-button" id="rbBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/33.png" alt="Retro Ball"><div>Retro Bowl</div></div>
+        <div class="game-button" id="rbcBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/34.png" alt="Retro Ball College"><div>Retro Bowl College</div></div>
+        <div class="game-button" id="srBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/369.png" alt="Slowroads"><div>Slowroads</div></div>
+        <div class="game-button" id="sr3dBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/119.png" alt="Snow Rider 3D"><div>Snow Rider 3D</div></div>
+        <div class="game-button" id="ssmaBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/118.png" alt="Solar Smash"><div>Solar Smash</div></div> 
+        <div class="game-button" id="sprBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/9.png" alt="Sprunki"><div>Sprunki</div></div>
+        <div class="game-button" id="ssbBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/131.png" alt="Subway Surfers: Barcelona"><div>Subway Surfers: Barcelona</div></div>
+        <div class="game-button" id="tr3dBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/414.png" alt="Twerk Race 3D"><div>Twerk Race 3D</div></div>
+        <div class="game-button" id="sioBtn"><img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/461.png" alt="Slither.IO"><div>Slither.IO</div></div>
+    </div>
+</div>
+
+<!-- Pr0x1es Page -->
+<div id="proxiesPage" class="content page">
+    <div class="welcome-text">Pr0x1es</div>
+    <div class="description">Pr0x1es Here If You Know What We Mean!</div>
+    <div class="game-grid">
+        <div class="game-button" id="pizzaBtn"><img src="https://c9qc3x2rttch.awesine.com/images/pizzalogo.png" alt="Pizza Edition"><div>Pizza Edition</div></div>
+    </div>
+</div>
+
+<div class="footer">Owned By DX.ZY</div>
+
+<script>
+// Page toggle
+const homeLink = document.getElementById('homeLink');
+const gamesLink = document.getElementById('gamesLink');
+const proxiesLink = document.getElementById('proxiesLink');
+const homePage = document.getElementById('homePage');
+const gamesPage = document.getElementById('gamesPage');
+const proxiesPage = document.getElementById('proxiesPage');
+
+homeLink.addEventListener('click', () => { homePage.classList.add('active'); gamesPage.classList.remove('active'); proxiesPage.classList.remove('active'); });
+gamesLink.addEventListener('click', () => { gamesPage.classList.add('active'); homePage.classList.remove('active'); proxiesPage.classList.remove('active'); });
+proxiesLink.addEventListener('click', () => { proxiesPage.classList.add('active'); homePage.classList.remove('active'); gamesPage.classList.remove('active'); });
+
+// Particles
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; });
+class Particle { constructor() { this.reset(); } reset() { this.x = Math.random() * width; this.y = Math.random() * height; this.size = Math.random() * 3 + 1; this.speedX = (Math.random() - 0.5) * 1; this.speedY = (Math.random() - 0.5) * 1; this.alpha = Math.random() * 0.5 + 0.2; } update() { this.x += this.speedX; this.y += this.speedY; if(this.x < 0 || this.x > width || this.y < 0 || this.y > height) { this.reset(); } } draw() { ctx.fillStyle = `rgba(255,255,255,${this.alpha})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+const particlesArray = []; for(let i = 0; i < 100; i++) { particlesArray.push(new Particle()); }
+function animate() { ctx.clearRect(0, 0, width, height); particlesArray.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+animate();
+
+// Open game in about:blank
+function openGame(url) {
+    const newTab = window.open('about:blank', '_blank');
+    newTab.document.write(`<!DOCTYPE html><html lang="en"><head><title>about:blank</title><style>body{margin:0;padding:0;overflow:hidden;background:#000;display:flex;justify-content:center;align-items:center;height:100vh;}iframe{width:100%;height:100%;border:none;}</style></head><body><iframe src="${url}"></iframe></body></html>`);
+    newTab.focus();
+}
+
+// Random proxy links
+const proxyLinks = [
+    "https://c9qc3x2rttch.awesine.com/",
+    "https://93ey5fgevv98.buddhalimbu.com.np/",
+    "https://jpzxj04sr45n.matribhumimf.com.np/",
+    "https://hj26ej95p3iz.netseclabs.gr/"
+];
+
+// Proxy listener - open in new tab
+document.getElementById('pizzaBtn').addEventListener('click', () => {
+    const link = proxyLinks[Math.floor(Math.random() * proxyLinks.length)];
+    window.open(link, '_blank'); // opens in new tab
+});
+
+// Games listeners
+document.getElementById('crazyCarsBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/CC/CC.html'); });
+document.getElementById('lolBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/1v1/1v1.LoL.html'); });
+document.getElementById('aswcBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/aswc/ASWC.html'); });
+document.getElementById('angryBirdsBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/AB/AB.html'); });
+document.getElementById('bouncemastersBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BMa/Bouncemasters.html'); });
+document.getElementById('candyCrushBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/CandyC/CC.html'); });
+document.getElementById('drawJoustBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/DJ/DJ.html'); });
+document.getElementById('driveMadBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/DM/DM.html'); });
+document.getElementById('rainbowObbyBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/RO/RO.html'); });
+document.getElementById('bloodMoneyBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BMY/BMY.html'); });
+document.getElementById('mc1122Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/MC1122.html'); });
+document.getElementById('moneyRushBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/MNYR.html'); });
+document.getElementById('mx3m2Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/MX3M2.html'); });
+document.getElementById('mx3m3Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/MX3M3.html'); });
+document.getElementById('mx3mppBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/MX3MPP.html'); });
+document.getElementById('mx3msBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/MX3MS.html'); });
+document.getElementById('pvzBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/PvZ.html'); });
+document.getElementById('run3Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/R3.html'); });
+document.getElementById('ragdollArchersBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GAMES/RA.html'); });
+document.getElementById('fnafBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/FNAF1/FNAF1.html'); });
+document.getElementById('fnaf2Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/FNAF2/FNAF2.html'); });
+document.getElementById('fnaf3Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/FNAF3/FNAF3.html'); });
+document.getElementById('fnaf4Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/FNAF4/FNAF4.html'); });
+document.getElementById('fnaf4hlwnBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/FNAF4hlwn/FNAF4hlwn.html'); });
+document.getElementById('gdlBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GDL/GDL.html'); });
+document.getElementById('gbBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/GB/GB.html'); });
+document.getElementById('tr2Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/TR2/TR2.html'); });
+document.getElementById('tfBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/TS3S/TF.html'); });
+document.getElementById('ts3sBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/TS3S/TS3S.html'); });
+document.getElementById('undertaleBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/TS3S/UDT.html'); });
+document.getElementById('shBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/SH/SH.html'); });
+document.getElementById('brBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BR/BR.html'); });
+document.getElementById('bbBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BB/BB.html'); });
+document.getElementById('bridgerBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BR1/BR.html'); });
+document.getElementById('borBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BR1/BOR.html'); });
+document.getElementById('cookiecBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BR1/CookieC.html'); });
+document.getElementById('badpBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/BR1/BP.html'); });
+document.getElementById('fmBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/FM/FM.html'); });
+document.getElementById('fmBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/FN/FN.html'); });
+document.getElementById('gn1Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/G.html'); });
+document.getElementById('gn2Btn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/G2.html'); });
+document.getElementById('gsBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/GS.html'); });
+document.getElementById('hhBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/HH.html'); });
+document.getElementById('jjBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/JJ.html'); });
+document.getElementById('rbBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/RB.html'); });
+document.getElementById('rbcBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/RBC.html'); });
+document.getElementById('srBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/SR.html'); });
+document.getElementById('sr3dBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/G/SR3D.html'); });
+document.getElementById('ssmaBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/SSMA/SOLARS.html'); });
+document.getElementById('sprBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/SPRU/SPRU.html'); });
+document.getElementById('ssbBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/SSB/SSBAR.html'); });
+document.getElementById('tr3dBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/TR3D/TR3DS.html'); });
+document.getElementById('sioBtn').addEventListener('click', () => { openGame('https://auresowner.github.io/SIOS/SIOS.html'); });
+</script>
+<script src="/active/uv/uv.bundle.js" charset="UTF-8" defer></script>
+<script src="/active/uv/uv.config.js" charset="UTF-8" defer></script>
+<script src="/active/register-sw.js" charset="UTF-8" defer></script>
+<script src="/active/search.js" charset="UTF-8" defer></script>
+<script src="/active/index.js" charset="UTF-8" defer></script>
+</body>
+</html>
+
+
+
+
+
+
